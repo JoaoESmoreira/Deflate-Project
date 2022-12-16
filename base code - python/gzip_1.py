@@ -237,6 +237,61 @@ class GZIP:
 				return codes
 
 
+			def read_huffman_trees(hft, codes, hlen, hlit=True):
+
+				if hlit:
+					ll = 257
+				else:
+					ll = 1
+
+				h_list = [-1 for _ in range(hlen + ll)]
+				i = 0
+				while i < hlen + 257:
+					if hlit and i >= hlen + 257:
+						break
+					elif not hlit and i >= hlen + 1:
+						break
+						
+
+					code = ""
+					p = -2 
+					hft.resetCurNode()
+					while p == -2:
+						new_bit = self.readBits(1)
+						code += str(new_bit)
+						p = hft.nextNode(str(new_bit))
+
+					if codes.index(code) > -1:
+						if codes.index(code) == 16:
+							bit = self.readBits(2)
+							for j in range(bit + 3 + 1):
+								h_list[i + j] = h_list[i - 1]
+							i += bit + 3
+
+						elif codes.index(code) == 17:
+							bit = self.readBits(3)
+							for j in range(bit + 3 + 1):
+								h_list[i + j] = 0
+							i += bit + 3
+
+						elif codes.index(code) == 18:
+							bit = self.readBits(7)
+							for j in range(bit + 11 + 1):
+								h_list[i + j] = 0
+							i += bit + 11
+
+						elif codes.index(code) < 16:
+							h_list[i] = codes.index(code)
+							i += 1
+
+					elif codes.index(code) == -1:
+						h_list[i] = 0
+						i += 1
+
+				return h_list
+
+
+
 			min, max = bounds(lengths)
 			count = occurencies(lengths, min, max)
 
@@ -254,86 +309,10 @@ class GZIP:
 					hft.addNode(codes[i], i, verbose)
 			
 
-			list_hliterais = [-1 for _ in range(hlit+257)]
-			i = 0
-
-			while i < hlit + 257:
-				code = ""
-				p = -2 
-				hft.resetCurNode()
-				while p == -2:
-					new_bit = self.readBits(1)
-					code += str(new_bit)
-					p = hft.nextNode(str(new_bit))
-
-				if codes.index(code) > -1:
-					if codes.index(code) == 16:
-						bit = self.readBits(2)
-						for j in range(bit + 3 + 1):
-							list_hliterais[i + j] = list_hliterais[i - 1]
-						i += bit + 3
-
-					elif codes.index(code) == 17:
-						bit = self.readBits(3)
-						for j in range(bit + 3 + 1):
-							list_hliterais[i + j] = 0
-						i += bit + 3
-
-					elif codes.index(code) == 18:
-						bit = self.readBits(7)
-						for j in range(bit + 11 + 1):
-							list_hliterais[i + j] = 0
-						i += bit + 11
-
-					elif codes.index(code) < 16:
-						list_hliterais[i] = codes.index(code)
-						i += 1
-
-				elif codes.index(code) == -1:
-					list_hliterais[i] = 0
-					i += 1
-				
-
+			list_hliterais = read_huffman_trees(hft, codes, hlit)
 			print("literals: ", list_hliterais)
-			list_hdist = [-1 for _ in range(hdist+1)]
-			i = 0
 
-			while i < hdist + 1:
-				code = ""
-				p = -2 
-				hft.resetCurNode()
-				while p == -2:
-					new_bit = self.readBits(1)
-					code += str(new_bit)
-					p = hft.nextNode(str(new_bit))
-
-				if codes.index(code) > -1:
-					if codes.index(code) == 16:
-						bit = self.readBits(2)
-						for j in range(bit + 3 + 1):
-							list_hdist[i + j] = list_hdist[i - 1]
-						i += bit + 3
-
-					elif codes.index(code) == 17:
-						bit = self.readBits(3)
-						for j in range(bit + 3 + 1):
-							list_hdist[i + j] = 0
-						i += bit + 3
-
-					elif codes.index(code) == 18:
-						bit = self.readBits(7)
-						for j in range(bit + 11 + 1):
-							list_hdist[i + j] = 0
-						i += bit + 11
-
-					elif codes.index(code) < 16:
-						list_hdist[i] = codes.index(code)
-						i += 1
-
-				elif codes.index(code) == -1:
-					list_hdist[i] = 0
-					i += 1
-
+			list_hdist = read_huffman_trees(hft, codes, hdist, False)
 			print("distancias: ", list_hdist)
 
 			# -------------------- Ex 6 --------------------------------
