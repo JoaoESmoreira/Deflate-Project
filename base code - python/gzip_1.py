@@ -495,7 +495,7 @@ class GZIP:
 						length = 227 + self.readBits(5)
 
 					elif code == 285:
-						length = 0
+						length = 258
 
 					code = ""
 					p = -2 
@@ -549,8 +549,6 @@ class GZIP:
 					elif code == 19:
 						distance = 769 + self.readBits(8)
 
-
-
 					elif code == 20:
 						distance = 1025 + self.readBits(9)
 					elif code == 21:
@@ -578,7 +576,6 @@ class GZIP:
 
 					for _ in range(length):
 						text.append(text[-distance])
-
 
 				else:
 					print("ERROR")
