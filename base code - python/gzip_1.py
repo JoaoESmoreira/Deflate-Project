@@ -437,7 +437,7 @@ class GZIP:
 					break
 
 				if 0 <= code < 256:
-					text.append(code)
+					text.append(chr(code))
 				elif code == 256:
 					print("FINISHED")
 
@@ -445,50 +445,145 @@ class GZIP:
 
 
 				elif 257 <= code < 286:
-					pos = code - 257
-					ll = self.readBits(bits[pos])
-					comp = length[pos] + ll
 
+					if 257 <= code < 265:
+						length = code - 257 + 3
 
-					aux_code = ""
+					elif code == 265:
+						length = 11 + self.readBits(1)
+					elif code == 266:
+						length = 13 + self.readBits(1)
+					elif code == 267:
+						length = 15 + self.readBits(1)
+					elif code == 268:
+						length = 17 + self.readBits(1)
+						
+					elif code == 269:
+						length = 19 + self.readBits(2)
+					elif code == 270:
+						length = 23 + self.readBits(2)
+					elif code == 271:
+						length = 27 + self.readBits(2)
+					elif code == 272:
+						length = 31 + self.readBits(2)
+
+					elif code == 273:
+						length = 35 + self.readBits(3)
+					elif code == 274:
+						length = 43 + self.readBits(3)
+					elif code == 275:
+						length = 51 + self.readBits(3)
+					elif code == 276:
+						length = 59 + self.readBits(3)
+
+					elif code == 277:
+						length = 67 + self.readBits(4)
+					elif code == 278:
+						length = 83 + self.readBits(4)
+					elif code == 279:
+						length = 99 + self.readBits(4)
+					elif code == 280:
+						length = 115 + self.readBits(4)
+				
+					elif code == 281:
+						length = 131 + self.readBits(5)
+					elif code == 282:
+						length = 163 + self.readBits(5)
+					elif code == 283:
+						length = 195 + self.readBits(5)
+					elif code == 284:
+						length = 227 + self.readBits(5)
+
+					elif code == 285:
+						length = 0
+
+					code = ""
 					p = -2 
 					hft_dist.resetCurNode()
 					while p == -2:
 						new_bit = self.readBits(1)
-						aux_code += str(new_bit)
+						code += str(new_bit)
 						p = hft_dist.nextNode(str(new_bit))
+					code = int(hdist_codes.index(code))
 
-					aux_code = int(hdist_codes.index(aux_code))
-					print(aux_code)
+					if 0 <= code < 4:
+						distance = code + 1
 
-					bit = self.readBits(bits2[aux_code])
-					distancia = dist[aux_code] + bit
+					elif code == 4:
+						distance = 5 + self.readBits(1)
+					elif code == 5:
+						distance = 7 + self.readBits(1)
 
-					ll = len(text)-1
-					for i in range(ll - distancia, ll + comp):
-						text.append(text[i])
+					elif code == 6:
+						distance = 9 + self.readBits(2)
+					elif code == 7:
+						distance = 13 + self.readBits(2)
 
+					elif code == 8:
+						distance = 17 + self.readBits(3)
+					elif code == 9:
+						distance = 25 + self.readBits(3)
+
+					elif code == 10:
+						distance = 33 + self.readBits(4)
+					elif code == 11:
+						distance = 49 + self.readBits(4)
+
+					elif code == 12:
+						distance = 65 + self.readBits(5)
+					elif code == 13:
+						distance = 97 + self.readBits(5)
+
+					elif code == 14:
+						distance = 129 + self.readBits(6)
+					elif code == 15:
+						distance = 193 + self.readBits(6)
+
+					elif code == 16:
+						distance = 257 + self.readBits(7)
+					elif code == 17:
+						distance = 285 + self.readBits(7)
+
+					elif code == 18:
+						distance = 513 + self.readBits(8)
+					elif code == 19:
+						distance = 769 + self.readBits(8)
+
+
+
+					elif code == 20:
+						distance = 1025 + self.readBits(9)
+					elif code == 21:
+						distance = 1537 + self.readBits(9)
+
+					elif code == 22:
+						distance = 2049 + self.readBits(10)
+					elif code == 23:
+						distance = 3073 + self.readBits(10)
+
+					elif code == 24:
+						distance = 4097 + self.readBits(11)
+					elif code == 25:
+						distance = 6145 + self.readBits(11)
+
+					elif code == 26:
+						distance = 8193 + self.readBits(12)
+					elif code == 27:
+						distance = 12289 + self.readBits(12)
 					
+					elif code == 28:
+						distance = 16385 + self.readBits(13)
+					elif code == 29:
+						distance = 24577 + self.readBits(13)
 
-					#for _ in range(comp):
-					#	text.append(text[-distancia])
+					for _ in range(length):
+						text.append(text[-distance])
 
-				
+
 				else:
 					print("ERROR")
 					break
-				
-			
-				# s1 s2 s3 s4 s5,
 
-				# com = 5
-				# dist = 3
-
-				# s1 s2 s3 s4 s5 s3 s4 s5 s3 s4
-
-
-			for i in range(len(text)):
-				text[i] = chr(text[i])
 
 			file = open("output.txt", "w")
 			for elem in text:
