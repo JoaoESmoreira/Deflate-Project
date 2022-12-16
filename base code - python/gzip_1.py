@@ -240,26 +240,6 @@ class GZIP:
 			min, max = bounds(lengths)
 			count = occurencies(lengths, min, max)
 
-			"""number = 0
-			bin_codes = []
-
-			for i in range(min, max+1):
-				number = number << 1
-				for _ in range(count[i-min]):
-					code = bin(number)[2:]
-					if len(code) != i:
-						code = '0'*(i-len(code)) + code
-
-					bin_codes.append(code)
-					number = number + 1
-
-			codes = [i for i in range(len(lengths))]
-			for i in codes:
-				for k in range(len(bin_codes)):
-					if len(bin_codes[k]) == lengths[i]:
-						codes[i] = bin_codes[k]
-						bin_codes[k] = ""
-						break"""
 			codes = generate_codes(min, max, count, lengths)
 			# Print codes
 			for i in range(len(codes)):
@@ -273,10 +253,6 @@ class GZIP:
 				if codes[i] != "":
 					hft.addNode(codes[i], i, verbose)
 			
-			# for i in range(len(codes)):
-			# 	if codes[i] != "":
-			# 		print(hft.findNode(codes[i]))
-
 
 			list_hliterais = [-1 for _ in range(hlit+257)]
 			i = 0
@@ -364,28 +340,6 @@ class GZIP:
 			min, max = bounds(list_hdist)
 			count = occurencies(list_hdist, min, max)
 			hdist_codes = generate_codes(min, max, count, list_hdist)
-			"""number = 0
-
-			bin_hdist = []
-
-			for i in range(min, max+1):
-				number = number << 1
-				for _ in range(count[i-min]):
-					code = bin(number)[2:]
-					if len(code) != i:
-						code = '0'*(i-len(code)) + code
-
-					bin_hdist.append(code)
-					number = number + 1
-			print(bin_hdist)
-
-			hdist_codes = [i for i in range(len(list_hdist))]
-			for i in hdist_codes:
-				for k in range(len(bin_hdist)):
-					if len(bin_hdist[k]) == list_hdist[i]:
-						hdist_codes[i] = bin_hdist[k]
-						bin_hdist[k] = ""
-						break"""
 
 			# Print codes
 			for i in range(len(hdist_codes)):
