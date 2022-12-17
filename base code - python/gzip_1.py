@@ -4,7 +4,7 @@
 
 import sys
 from huffmantree import HuffmanTree
-import numpy as np
+
 
 class GZIPHeader:
 	''' class for reading and storing GZIP header fields '''
@@ -161,7 +161,6 @@ class GZIP:
 				print('Error: Block %d not coded with Huffman Dynamic coding' % (numBlocks+1))
 				return
 			
-									
 			# Exercicio 1
 			hlit = self.readBits(5)
 			hdist = self.readBits(5)
@@ -171,17 +170,19 @@ class GZIP:
 			print("hdist", hdist)
 			print("hclen", hclen)
 
-            # Exercicio 2
-			list_ordem = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,12,2,14,1,15]
+			# Exercicio 2
+
+			list_ordem = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 12, 2, 14, 1, 15]
 			lengths = [0 for _ in range(len(list_ordem))]
 
-			for i in range(hclen+4):
+			for i in range(hclen + 4):
 				lengths[list_ordem[i]] = self.readBits(3)
 
 			print("lengths: ", lengths)
 
 
-			# exercicio 3
+			# Exercicio 3
+
 			def bounds(lenghts):
 				"""Calculate."""
 				for elem in lenghts:
@@ -197,14 +198,13 @@ class GZIP:
 
 				return min, max
 
-
 			def occurencies(lenghts, min, max):
 				"""Calculate."""
-				count = [0 for _ in range(min, max+1)]
+				count = [0 for _ in range(min, max + 1)]
 
 				for elem in lenghts:
 					if elem != 0:
-						count[elem-min] += 1
+						count[elem - min] += 1
 
 				return count
 
@@ -212,12 +212,12 @@ class GZIP:
 				number = 0
 				bin_codes = []
 
-				for i in range(min, max+1):
+				for i in range(min, max + 1):
 					number = number << 1
-					for _ in range(count[i-min]):
+					for _ in range(count[i - min]):
 						code = bin(number)[2:]
 						if len(code) != i:
-							code = '0'*(i-len(code)) + code
+							code = '0' * (i - len(code)) + code
 
 						bin_codes.append(code)
 						number = number + 1
@@ -236,7 +236,6 @@ class GZIP:
 
 				return codes
 
-
 			def read_huffman_trees(hft, codes, hlen, hlit=True):
 
 				if hlit:
@@ -251,10 +250,9 @@ class GZIP:
 						break
 					elif not hlit and i >= hlen + 1:
 						break
-						
 
 					code = ""
-					p = -2 
+					p = -2
 					hft.resetCurNode()
 					while p == -2:
 						new_bit = self.readBits(1)
@@ -290,8 +288,6 @@ class GZIP:
 
 				return h_list
 
-
-
 			min, max = bounds(lengths)
 			count = occurencies(lengths, min, max)
 
@@ -300,14 +296,12 @@ class GZIP:
 			for i in range(len(codes)):
 				print("Symbol: ", i, "code: ", codes[i])
 
-
 			hft = HuffmanTree()
 			verbose = True
 
 			for i in range(len(codes)):
 				if codes[i] != "":
 					hft.addNode(codes[i], i, verbose)
-			
 
 			list_hliterais = read_huffman_trees(hft, codes, hlit)
 			print("literals: ", list_hliterais)
@@ -315,7 +309,8 @@ class GZIP:
 			list_hdist = read_huffman_trees(hft, codes, hdist, False)
 			print("distancias: ", list_hdist)
 
-			# -------------------- Ex 6 --------------------------------
+			# Exercicio 6
+
 			min, max = bounds(list_hdist)
 			count = occurencies(list_hdist, min, max)
 			hdist_codes = generate_codes(min, max, count, list_hdist)
@@ -323,7 +318,6 @@ class GZIP:
 			# Print codes
 			for i in range(len(hdist_codes)):
 				print("Symbol: ", i, "code: ", hdist_codes[i])
-		
 
 			min, max = bounds(list_hliterais)
 			count = occurencies(list_hliterais, min, max)
@@ -331,7 +325,6 @@ class GZIP:
 			for i in range(len(hliterals_codes)):
 				print("Symbol: ", i, "code: ", hliterals_codes[i])
 
-			
 			hft_literals = HuffmanTree()
 			for i in range(len(hliterals_codes)):
 				if hliterals_codes[i] != "":
@@ -342,197 +335,72 @@ class GZIP:
 				if hdist_codes[i] != "":
 					hft_dist.addNode(hdist_codes[i], i, verbose)
 
-
-
-			# -------------------- EX 7 -----------------------------------------
-
 			print("\n\n--- EX 7 ---\n\n")
+
 			text = []
-			bits = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]
-			length = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258]
-			dist = [1,2,3,4,5,7,9,13,17,33,49,65,97,129,193,257,385,513,1025,1537,2049,3073,4097,6145,8193,12289,16385]
-			bits2 = [0,0,0,0,1,1,2,2,3,4,4,5,5,6,6,7,7,8,9,9,10,10,11,11,12,12,13]
+			char = 0
+			bits = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]
+			length = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258]
+			dist = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049,3073, 4097,6145, 8193, 12289, 16385, 24577]
+			bits2 = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]
 
-			while True:
+			while char != 256:
 				try:
-					code = ""
-					p = -2 
-					hft_literals.resetCurNode()
-					while p == -2:
-						new_bit = self.readBits(1)
-						code += str(new_bit)
-						p = hft_literals.nextNode(str(new_bit))
-
-					#print("code: ", code, " . ",  hliterals_codes.index(code))
-					code = int(hliterals_codes.index(code))
+					node = self.search_node(hft_literals)
 				except:
 					print("log: break\n")
 					break
 
-				if 0 <= code < 256:
-					text.append(chr(code))
-				elif code == 256:
+				if 0 <= node < 256:
+					text.append(node)
+				elif node == 256:
 					print("FINISHED")
-
 					break
+				elif 256 < node < 286:
+					pos = node - 257
+					bit = self.readBits(bits[pos])
+					comp = length[pos] + bit
 
+					node = self.search_node(hft_dist)
 
-				elif 257 <= code < 286:
+					bit = self.readBits(bits2[node])
+					distancia = dist[node] + bit
 
-					if 257 <= code < 265:
-						length = code - 257 + 3
-
-					elif code == 265:
-						length = 11 + self.readBits(1)
-					elif code == 266:
-						length = 13 + self.readBits(1)
-					elif code == 267:
-						length = 15 + self.readBits(1)
-					elif code == 268:
-						length = 17 + self.readBits(1)
-						
-					elif code == 269:
-						length = 19 + self.readBits(2)
-					elif code == 270:
-						length = 23 + self.readBits(2)
-					elif code == 271:
-						length = 27 + self.readBits(2)
-					elif code == 272:
-						length = 31 + self.readBits(2)
-
-					elif code == 273:
-						length = 35 + self.readBits(3)
-					elif code == 274:
-						length = 43 + self.readBits(3)
-					elif code == 275:
-						length = 51 + self.readBits(3)
-					elif code == 276:
-						length = 59 + self.readBits(3)
-
-					elif code == 277:
-						length = 67 + self.readBits(4)
-					elif code == 278:
-						length = 83 + self.readBits(4)
-					elif code == 279:
-						length = 99 + self.readBits(4)
-					elif code == 280:
-						length = 115 + self.readBits(4)
-				
-					elif code == 281:
-						length = 131 + self.readBits(5)
-					elif code == 282:
-						length = 163 + self.readBits(5)
-					elif code == 283:
-						length = 195 + self.readBits(5)
-					elif code == 284:
-						length = 227 + self.readBits(5)
-
-					elif code == 285:
-						length = 258
-
-					code = ""
-					p = -2 
-					hft_dist.resetCurNode()
-					while p == -2:
-						new_bit = self.readBits(1)
-						code += str(new_bit)
-						p = hft_dist.nextNode(str(new_bit))
-					code = int(hdist_codes.index(code))
-
-					if 0 <= code < 4:
-						distance = code + 1
-
-					elif code == 4:
-						distance = 5 + self.readBits(1)
-					elif code == 5:
-						distance = 7 + self.readBits(1)
-
-					elif code == 6:
-						distance = 9 + self.readBits(2)
-					elif code == 7:
-						distance = 13 + self.readBits(2)
-
-					elif code == 8:
-						distance = 17 + self.readBits(3)
-					elif code == 9:
-						distance = 25 + self.readBits(3)
-
-					elif code == 10:
-						distance = 33 + self.readBits(4)
-					elif code == 11:
-						distance = 49 + self.readBits(4)
-
-					elif code == 12:
-						distance = 65 + self.readBits(5)
-					elif code == 13:
-						distance = 97 + self.readBits(5)
-
-					elif code == 14:
-						distance = 129 + self.readBits(6)
-					elif code == 15:
-						distance = 193 + self.readBits(6)
-
-					elif code == 16:
-						distance = 257 + self.readBits(7)
-					elif code == 17:
-						distance = 285 + self.readBits(7)
-
-					elif code == 18:
-						distance = 513 + self.readBits(8)
-					elif code == 19:
-						distance = 769 + self.readBits(8)
-
-					elif code == 20:
-						distance = 1025 + self.readBits(9)
-					elif code == 21:
-						distance = 1537 + self.readBits(9)
-
-					elif code == 22:
-						distance = 2049 + self.readBits(10)
-					elif code == 23:
-						distance = 3073 + self.readBits(10)
-
-					elif code == 24:
-						distance = 4097 + self.readBits(11)
-					elif code == 25:
-						distance = 6145 + self.readBits(11)
-
-					elif code == 26:
-						distance = 8193 + self.readBits(12)
-					elif code == 27:
-						distance = 12289 + self.readBits(12)
-					
-					elif code == 28:
-						distance = 16385 + self.readBits(13)
-					elif code == 29:
-						distance = 24577 + self.readBits(13)
-
-					for _ in range(length):
-						text.append(text[-distance])
+					ll = len(text)
+					for i in range(comp):
+						text.append(text[ll - distancia + i])
 
 				else:
 					print("ERROR")
 					break
 
+			for i in range(len(text)):
+				text[i] = chr(text[i])
 
 			file = open("output.txt", "w")
 			for elem in text:
 				file.write(elem)
 			file.close()
 
-
 			# update number of blocks read
 			numBlocks += 1
-		
+
 		# close file			
+		
 		self.f.close()	
 		print("End: %d block(s) analyzed." % numBlocks)
+
+
+	def search_node(self, huffman_tree):
+		node = -1
+
+		while node == -1 or node == -2:
+			code = str(self.readBits(1))
+			node = huffman_tree.nextNode(code)
+
+		huffman_tree.resetCurNode()
+		return node
 	
-
-
-
-
-
 	
 	def getOrigFileSize(self):
 		''' reads file size of original file (before compression) - ISIZE '''
@@ -579,8 +447,6 @@ class GZIP:
 
 		return value
 
-	
-
 
 if __name__ == '__main__':
 
@@ -591,6 +457,5 @@ if __name__ == '__main__':
 
 	# decompress file
 	gz = GZIP(fileName)
-	print("Decompress")
 	gz.decompress()
 	
