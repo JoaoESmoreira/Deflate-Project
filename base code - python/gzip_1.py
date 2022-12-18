@@ -161,7 +161,8 @@ class GZIP:
 				print('Error: Block %d not coded with Huffman Dynamic coding' % (numBlocks+1))
 				return
 			
-			# Exercicio 1
+
+			# ================ Exercicio 1 ======================
 			hlit = self.readBits(5)
 			hdist = self.readBits(5)
 			hclen = self.readBits(4)
@@ -170,21 +171,20 @@ class GZIP:
 			print("hdist", hdist)
 			print("hclen", hclen)
 
-			# Exercicio 2
 
-			list_ordem = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 12, 2, 14, 1, 15]
-			lengths = [0 for _ in range(len(list_ordem))]
+			# ================ Exercicio 2 ======================
+			order_list = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 12, 2, 14, 1, 15]
+			lengths = [0 for _ in range(len(order_list))]
 
 			for i in range(hclen + 4):
-				lengths[list_ordem[i]] = self.readBits(3)
+				lengths[order_list[i]] = self.readBits(3)
 
 			print("lengths: ", lengths)
 
 
-			# Exercicio 3
-
+			# ================= Exercicio 3 ========================
 			def bounds(lenghts):
-				"""Calculate."""
+				"""Calculate min and max of an array."""
 				for elem in lenghts:
 					if elem != 0:
 						min = max = elem
@@ -198,17 +198,18 @@ class GZIP:
 
 				return min, max
 
-			def occurencies(lenghts, min, max):
-				"""Calculate."""
+			def occurencies(lengths, min, max):
+				"""Calculate all occurencies of a length."""
 				count = [0 for _ in range(min, max + 1)]
 
-				for elem in lenghts:
+				for elem in lengths:
 					if elem != 0:
 						count[elem - min] += 1
 
 				return count
 
 			def generate_codes(min, max, count, lengths):
+				"""Generate all codes."""
 				number = 0
 				bin_codes = []
 
@@ -236,6 +237,23 @@ class GZIP:
 
 				return codes
 
+
+			min, max = bounds(lengths)
+			count = occurencies(lengths, min, max)
+			codes = generate_codes(min, max, count, lengths)
+
+			# Print codes
+			for i in range(len(codes)):
+				print("Symbol: ", i, "code: ", codes[i])
+
+			hft = HuffmanTree()
+			verbose = True
+			for i in range(len(codes)):
+				if codes[i] != "":
+					hft.addNode(codes[i], i, verbose)
+
+
+			# ================== Exercicio 4 e 5 =========================
 			def read_huffman_trees(hft, codes, hlen, hlit=True):
 
 				if hlit:
@@ -288,29 +306,14 @@ class GZIP:
 
 				return h_list
 
-			min, max = bounds(lengths)
-			count = occurencies(lengths, min, max)
-
-			codes = generate_codes(min, max, count, lengths)
-			# Print codes
-			for i in range(len(codes)):
-				print("Symbol: ", i, "code: ", codes[i])
-
-			hft = HuffmanTree()
-			verbose = True
-
-			for i in range(len(codes)):
-				if codes[i] != "":
-					hft.addNode(codes[i], i, verbose)
-
 			list_hliterais = read_huffman_trees(hft, codes, hlit)
 			print("literals: ", list_hliterais)
 
 			list_hdist = read_huffman_trees(hft, codes, hdist, False)
 			print("distancias: ", list_hdist)
 
-			# Exercicio 6
 
+			# ===================== Exercicio 6 ==========================
 			min, max = bounds(list_hdist)
 			count = occurencies(list_hdist, min, max)
 			hdist_codes = generate_codes(min, max, count, list_hdist)
@@ -335,21 +338,15 @@ class GZIP:
 				if hdist_codes[i] != "":
 					hft_dist.addNode(hdist_codes[i], i, verbose)
 
-			print("\n\n--- EX 7 ---\n\n")
-
+			# Exercicio 7
 			text = []
-			char = 0
 			bits = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0]
 			length = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258]
 			dist = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049,3073, 4097,6145, 8193, 12289, 16385, 24577]
 			bits2 = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13]
 
-			while char != 256:
-				try:
-					node = self.search_node(hft_literals)
-				except:
-					print("log: break\n")
-					break
+			while True:
+				node = self.search_node(hft_literals)
 
 				if 0 <= node < 256:
 					text.append(node)
@@ -366,14 +363,15 @@ class GZIP:
 					bit = self.readBits(bits2[node])
 					distancia = dist[node] + bit
 
-					ll = len(text)
 					for i in range(comp):
-						text.append(text[ll - distancia + i])
+						text.append(text[-distancia])
 
 				else:
 					print("ERROR")
 					break
 
+			
+			# ================= Exercicio 8 =======================
 			for i in range(len(text)):
 				text[i] = chr(text[i])
 
